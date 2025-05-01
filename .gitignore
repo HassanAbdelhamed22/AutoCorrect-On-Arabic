@@ -1,0 +1,51 @@
+# Ignore large CSV files
+*.csv
+
+Arabic_Autocorrect_V2.ipynb
+Arabic_Autocorrect.ipynb
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# VSCode and other editor settings
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python virtual environments
+env/
+venv/
+ENV/
+
+# Git LFS metadata (if you decide to use LFS)
+*.lfs
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+
+# Ignore compiled models or data outputs
+*.h5
+*.pkl
+*.joblib
+*.npy
+*.npz
+
+# Ignore environment variable files
+.env
+
+# Ignore testing/report files
+coverage/
+*.coverage
+htmlcov/
+
+# Ignore Jupyter Notebook cache
+.jupyter/
