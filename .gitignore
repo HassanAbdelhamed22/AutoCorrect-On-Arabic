@@ -1,5 +1,5 @@
 # Ignore large CSV files
-*.csv
+# *.csv
 
 Arabic_Autocorrect_V2.ipynb
 Arabic_Autocorrect.ipynb
