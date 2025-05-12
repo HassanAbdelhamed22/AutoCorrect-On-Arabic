@@ -94,14 +94,20 @@ def predict(masked_sentence: str, top_k=25) -> list:
     return predictions
 
 
-def pipeline(input_text: str, vocab: dict, verbose: bool = False) -> str:
+def pipeline(input_text: str, vocab: dict, verbose: bool = True) -> str:
     processed_text = preprocess(input_text)
+    vocab = data_vocab(df, min_freq=3)
     misspelled_indices = find_misspellings(processed_text, vocab)
+
     if not misspelled_indices:
-        return processed_text
+        if verbose:
+            print("✅ لا توجد أخطاء إملائية واضحة.")
+        return processed_text, {}
+
     masked_sentences = generate_masked_sentences(processed_text, misspelled_indices)
     words = processed_text.split()
     corrections = {}
+
     for idx, masked in zip(misspelled_indices, masked_sentences):
         original_word = words[idx]
         candidates = predict(masked)
@@ -111,12 +117,18 @@ def pipeline(input_text: str, vocab: dict, verbose: bool = False) -> str:
             )
             corrections[original_word] = best_candidate
             words[idx] = best_candidate
+
     corrected_sentence = " ".join(words)
-    return corrected_sentence
+
+    if verbose:
+        print("🔍 الكلمات التي تم تصحيحها:")
+        for original, corrected in corrections.items():
+            print(f" - {original} ➤ {corrected}")
+
+    return corrected_sentence, corrections
 
 
 # ==== Clean dataset ====
-# Clean dataset
 df = df.drop(columns=["targe"], errors="ignore").dropna().drop_duplicates()
 df["text"] = df["text"].apply(preprocess)
 df["text"] = df["text"].apply(lambda x: x if len(x.split()) > 5 else None)
@@ -133,12 +145,17 @@ def correct_text():
         result_var.set("❌ الرجاء إدخال نص أولاً.")
         return
 
-    corrected = pipeline(input_text, words_freq)
+    corrected, corrections = pipeline(input_text, words_freq)
 
     if corrected.strip() == preprocess(input_text).strip():
-        result_var.set("✅ لا توجد أخطاء إملائية:\n\n" + corrected)
+        result_var.set(f"✅ لا توجد أخطاء إملائية:\n\n{corrected}")
     else:
-        result_var.set(f"❌ قبل التصحيح:\n{input_text}\n\n✅ بعد التصحيح:\n{corrected}")
+        # عرض الكلمات المصححة
+        corrections_text = "🔍 الكلمات التي تم تصحيحها:\n"
+        for original, corrected_word in corrections.items():
+            corrections_text += f" - {original} ➤ {corrected_word}\n"
+
+        result_var.set(f"❌ قبل التصحيح:\n{input_text}\n\n✅ بعد التصحيح:\n{corrected}\n\n{corrections_text}")
 
     entry.delete("1.0", tk.END)
 
@@ -168,7 +185,7 @@ entry = tk.Text(
     pady=10,
 )
 entry.pack(pady=10)
-entry.tag_configure("right", justify='right')
+entry.tag_configure("right", justify="right")
 entry.insert("1.0", "")
 entry.tag_add("right", "1.0", "end")
 
